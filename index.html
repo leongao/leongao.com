@@ -1,11 +1,165 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>leongao.com</title>
-  </head>
-  <body>
-    <h1>Hello, this is leongao.com!</h1>
-    <p>Your GitHub Pages is working!</p>
-  </body>
+<!doctype html>
+<html lang="zh-CN" id="top">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leon — Hero + Episodes (组件版)</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <!-- Google Fonts: Poetsen One for masthead/labels -->
+  <link href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0d0d0d; --muted:#3856a8; --line:#e6e6e6;
+      --blue:#2563eb; --red:#ef2b2b; /* 品牌双色 */
+      --container: 1080px; --radius: 14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--text); font:16px/1.6 ui-sans-serif,-apple-system,system-ui,"SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+    a{color:inherit; text-decoration:none}
+    .container{max-width:var(--container); margin:0 auto; padding:20px 22px}
+
+    /* ===== 顶部：左图 + 右侧叠字 ===== */
+    .mast{padding:56px 0 40px}
+    .mast-grid{display:grid; grid-template-columns:minmax(260px,440px) 1fr; gap:28px; align-items:center}
+    .mascot{width:100%; height:auto; display:block}
+    .poetsen{font-family:"Poetsen One", ui-sans-serif, -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-weight:400; letter-spacing:.2px}
+    .stack-type{display:grid; line-height:.9}
+    .stack-type .main{grid-area:1/1; font-size:90px; color:var(--red)}
+    .stack-type .sub{grid-area:1/1; font-size:72px; color:var(--blue); transform: translate(14px, -12px)}
+    @media (max-width: 960px){
+      .mast-grid{grid-template-columns:1fr}
+      .stack-type .main{font-size:64px}
+      .stack-type .sub{font-size:52px; transform: translate(8px, -8px)}
+    }
+
+    /* ===== Episodes 列表（复用组件） ===== */
+    .divider-blue{height:3px; background:var(--blue); margin:22px 0 26px}
+    .episodes{display:flex; flex-direction:column; gap:34px}
+    .ep{padding:12px 0 34px; border-bottom:3px solid var(--red)}
+    .ep:last-child{border-bottom:none}
+
+    .ep-label{font-family:"Poetsen One", ui-sans-serif; font-size:26px; color:var(--blue); text-shadow: 3px 2px 0 var(--red); margin:0 0 14px}
+
+    .ep-grid{display:grid; grid-template-columns:140px 1fr; gap:18px; align-items:center}
+    @media (max-width:680px){ .ep-grid{grid-template-columns:1fr; align-items:flex-start} }
+
+    /* 封面三层描边堆叠 */
+    .thumb-wrap{position:relative; width:132px; height:132px}
+    .thumb{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border:6px solid #fff; box-shadow:0 0 0 4px var(--blue); z-index:3}
+    .thumb-wrap::before, .thumb-wrap::after{content:""; position:absolute; width:100%; height:100%; box-shadow:0 0 0 6px var(--red); background:transparent; z-index:1}
+    .thumb-wrap::before{transform: translate(10px, 10px)}
+    .thumb-wrap::after{transform: translate(18px, 18px); box-shadow:0 0 0 4px var(--blue)}
+
+    .ep-title{font-weight:700; font-size:22px; color:var(--blue); line-height:1.4}
+    .ep-title .hl{color:var(--red)}
+    .ep-title-link{display:inline-block}
+    .ep-title-link:hover{transform: translateY(-1px)}
+
+    /* ===== 返回顶部按钮（SVG 图片版本） ===== */
+    .back-top{position:fixed; right:22px; bottom:22px; z-index:100; display:inline-flex; flex-direction:column; align-items:center; gap:4px; padding:10px 12px; border:3px solid var(--red); border-radius:14px; box-shadow: 0 0 0 3px var(--blue) inset; background:#fff}
+    .back-top img.top-icon{display:block; width:22px; height:22px}
+    .back-top span{font-family:"Poetsen One"; font-size:12px; color:var(--blue)}
+    .back-top:hover{transform: translateY(-3px)}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <!-- 顶部区域：左侧 SVG + 右侧叠字标题 -->
+    <section class="mast">
+      <div class="mast-grid">
+        <img src="/assets/mascot.svg" alt="Leon 手绘小恶魔（SVG）" class="mascot" />
+        <div class="stack-type poetsen" aria-label="欢迎语">
+          <div class="sub">This is Leon</div>
+          <div class="main">Nice to meet you</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider-blue" aria-hidden="true"></div>
+
+    <!-- Episodes 容器：JS 组件渲染到此 -->
+    <section id="episodes" class="episodes" aria-label="播客/文章列表"></section>
+  </main>
+
+  <!-- 组件模板：Episode 卡片 -->
+  <template id="ep-template">
+    <article class="ep">
+      <h3 class="ep-label">Episode #<span class="num"></span></h3>
+      <div class="ep-grid">
+        <a class="thumb-wrap" href="" target="_blank" rel="noopener" aria-label="查看详情">
+          <img class="thumb" src="" alt="" />
+        </a>
+        <div class="ep-meta">
+          <a class="ep-title-link" href="" target="_blank" rel="noopener">
+            <div class="ep-title"></div>
+          </a>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <!-- 数据源（可改为外部 JSON） -->
+  <script id="episodes-data" type="application/json">[
+    {
+      "number": 1,
+      "titleHTML": "“<span class=\"hl\">失去</span>” 30 年，日本人如何面对<br>不确定的未来与确定的 “<span class=\"hl\">老后</span>”",
+      "cover": "/assets/episode-1.jpg",
+      "coverAlt": "Episode 1 封面",
+      "href": "#"
+    }
+  ]</script>
+
+  <!-- 渲染逻辑：最小依赖、可复用 -->
+  <script>
+    (function(){
+      const mount = document.getElementById('episodes');
+      const tpl = document.getElementById('ep-template');
+      const dataTag = document.getElementById('episodes-data');
+      let items = [];
+      try { items = JSON.parse(dataTag.textContent.trim()); } catch(e){ items = []; }
+
+      function renderEpisodes(list, target){
+        target.innerHTML = '';
+        list.forEach((it, idx)=>{
+          const node = tpl.content.cloneNode(true);
+          node.querySelector('.num').textContent = it.number ?? (idx + 1);
+
+          const cover = node.querySelector('.thumb');
+          cover.src = it.cover; cover.alt = it.coverAlt || `Episode ${it.number || (idx+1)} 封面`;
+
+          const coverLink = node.querySelector('.thumb-wrap');
+          if (it.href) coverLink.href = it.href; else coverLink.removeAttribute('href');
+
+          const title = node.querySelector('.ep-title');
+          title.innerHTML = it.titleHTML || (it.title || '');
+
+          const titleLink = node.querySelector('.ep-title-link');
+          if (it.href) titleLink.href = it.href; else titleLink.removeAttribute('href');
+
+          target.appendChild(node);
+        });
+      }
+
+      renderEpisodes(items, mount);
+      // 暴露给全局，便于后续动态替换数据
+      window.renderEpisodes = renderEpisodes;
+    })();
+  </script>
+
+  <!-- 返回顶部（SVG 图片版本）: 请将 /assets/top.svg 放入仓库。示例 SVG 见下方注释。 -->
+  <a class="back-top" href="#top" aria-label="返回顶部">
+    <img class="top-icon" src="/assets/top.svg" alt="" />
+    <span>Top</span>
+  </a>
+
+  <!--
+  /assets/top.svg 示例内容：
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+    <rect x="3" y="3" width="42" height="42" rx="10" fill="#fff" stroke="#ef2b2b" stroke-width="6"/>
+    <path d="M24 34V14M14 24l10-10 10 10" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  可按需替换 stroke 颜色与圆角。
+  -->
+</body>
 </html>
