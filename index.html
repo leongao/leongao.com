@@ -28,6 +28,7 @@
     .mast{padding:3.5rem 0 2.5rem}
     .mast-grid{display:grid; grid-template-columns:minmax(16.25rem,27.5rem) 1fr; gap:1.75rem; align-items:center}
     .mascot{width:100%; height:auto; display:block}
+    .mascot-lottie{width:100%; aspect-ratio: 1 / 1; display:block}
     .poetsen{font-family:'PoetsenOneLocal','Poetsen One', ui-sans-serif, -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-weight:400; letter-spacing:0.0125rem}
     .stack-type{display:grid; line-height:.9; isolation:isolate}
     .stack-type .main{grid-area:1/1; font-size:5.625rem; color:var(--red); mix-blend-mode:multiply;}
@@ -72,7 +73,7 @@
     <!-- 顶部区域：左侧 SVG + 右侧叠字标题 -->
     <section class="mast">
       <div class="mast-grid">
-        <img src="/assets/mascot.svg" alt="Leon 手绘小恶魔（SVG）" class="mascot" />
+        <div id="mascot" class="mascot-lottie" role="img" aria-label="Leon 手绘小恶魔动画"></div>
         <div class="stack-type poetsen" aria-label="欢迎语">
           <div class="sub">This is Leon</div>
           <div class="main">Nice to meet you</div>
@@ -155,6 +156,25 @@
       renderEpisodes(items, mount);
       // 暴露给全局，便于后续动态替换数据
       window.renderEpisodes = renderEpisodes;
+    })();
+  </script>
+
+  <!-- Lottie mascot -->
+  <script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+  <script>
+    (function(){
+      var container = document.getElementById('mascot');
+      if(!container) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var anim = lottie.loadAnimation({
+        container: container,
+        renderer: 'svg',
+        loop: true,
+        autoplay: !reduce,
+        path: '/assets/monstermove.json',
+        rendererSettings: { preserveAspectRatio: 'xMidYMid meet' }
+      });
+      if(reduce){ anim.pause(); }
     })();
   </script>
 
